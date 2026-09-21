@@ -6,7 +6,7 @@ namespace AlgoLab.Algorithms.Implementations
     public sealed class SimplePow : IStepAlgorithm<PowInput>
     {
         public string Code => "simple-pow";
-
+        public string Name => "Simple Pow";
         public long ExecuteCountingSteps(PowInput input)
         {
             var number = input.number;

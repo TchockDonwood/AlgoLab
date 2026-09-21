@@ -5,6 +5,7 @@ namespace AlgoLab.Algorithms.Implementations
     public sealed class SumFunction : IAlgorithm<int[]>
     {
         public string Code => "sum-function";
+        public string Name => "SumFunction";
 
         public void Execute(int[] input)
         {

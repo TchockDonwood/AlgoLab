@@ -6,7 +6,7 @@ namespace AlgoLab.Algorithms.Implementations
     public sealed class MultiplyMatrix : IAlgorithm<MatrixPair>
     {
         public string Code => "multiply-matrix";
-
+        public string Name => "Matrix Multiplication";
         public void Execute(MatrixPair input)
         {
             var first = input.Left;

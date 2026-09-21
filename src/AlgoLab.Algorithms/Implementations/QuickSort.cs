@@ -6,7 +6,7 @@ namespace AlgoLab.Algorithms.Implementations
     public sealed class QuickSort : IAlgorithm<double[]>
     {
         public string Code => "quick-sort";
-
+        public string Name => "Quick Sort";
         public void Execute(double[] input)
         {
             var start = 0;

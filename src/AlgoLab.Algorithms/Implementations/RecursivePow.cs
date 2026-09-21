@@ -3,10 +3,10 @@ using AlgoLab.Domain.Models;
 
 namespace AlgoLab.Algorithms.Implementations
 {
-    public sealed class QuickRecursivePow : IStepAlgorithm<PowInput>
+    public sealed class RecursivePow : IStepAlgorithm<PowInput>
     {
-        public string Code => "quick-recursive-pow";
-        public string Name => "Quick Recursive Pow";
+        public string Code => "recursive-pow";
+        public string Name => "Recursive Pow";
 
         public long ExecuteCountingSteps(PowInput input)
         {
@@ -16,7 +16,7 @@ namespace AlgoLab.Algorithms.Implementations
             long steps = 0;
 
             Pow(number, exp, ref steps);
-            
+
             return steps;
         }
 
@@ -33,21 +33,11 @@ namespace AlgoLab.Algorithms.Implementations
                 return 1;
             }
 
+            steps++; // exp - 1
             steps++; // вызов Pow
-            long result = Pow(number, exp / 2, ref steps);
-
-            steps++; // if (exp % 2 != 0)
-            if (exp % 2 != 0)
-            {
-                steps++; // умножение result * result
-                steps++; // умножение на number
-                return result * result * number;
-            }
-            else
-            {
-                steps++; // умножение result * result
-                return result * result;
-            }
+            steps++; // number * Pow
+            steps++; // return
+            return number * Pow(number, exp - 1, ref steps);
         }
     }
 }

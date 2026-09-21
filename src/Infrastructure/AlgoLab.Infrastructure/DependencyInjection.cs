@@ -28,12 +28,21 @@ namespace AlgoLab.Infrastructure
 
         public static IServiceCollection AddAlgorithms(this IServiceCollection services)
         {
+            services.AddSingleton<IAlgorithm, ConstFunction>();
+            services.AddSingleton<IAlgorithm, SumFunction>();
+            services.AddSingleton<IAlgorithm, ProductFunction>();
+            services.AddSingleton<IAlgorithm, NaivePolynomial>();
+            services.AddSingleton<IAlgorithm, HornerPolynomial>();
             services.AddSingleton<IAlgorithm, BubbleSort>();
-            //services.AddSingleton<IAlgorithm, QuickSort>();
-            //services.AddSingleton<IAlgorithm, MergeSort>();
-            //services.AddSingleton<IAlgorithm, TimSort>();
-            //services.AddSingleton<IAlgorithm, ShakerSort>();
-            
+            services.AddSingleton<IAlgorithm, QuickSort>();
+            services.AddSingleton<IAlgorithm, TimSort>();
+            services.AddSingleton<IAlgorithm, MultiplyMatrix>();
+            services.AddSingleton<IAlgorithm, SmoothSort>();
+            services.AddSingleton<IAlgorithm, SieveOfEratosthenes>();
+            //services.AddSingleton<IAlgorithm, >();
+            services.AddSingleton<IAlgorithm, SimplePow>();
+            services.AddSingleton<IAlgorithm, RecursivePow>();
+            services.AddSingleton<IAlgorithm, QuickRecursivePow>();
 
             services.AddSingleton<IAlgorithmRegistry, AlgorithmRegistry>();
 

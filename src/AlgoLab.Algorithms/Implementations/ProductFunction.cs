@@ -2,10 +2,10 @@
 
 namespace AlgoLab.Algorithms.Implementations
 {
-    public sealed class ProductFunction : IAlgorithm
+    public sealed class ProductFunction : IAlgorithm<int[]>
     {
         public string Code => "product-function";
-
+        public string Name => "Product Function";
         public void Execute(int[] input)
         {
             var product = 1;

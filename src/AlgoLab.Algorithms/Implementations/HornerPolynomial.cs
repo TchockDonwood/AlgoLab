@@ -5,7 +5,7 @@ namespace AlgoLab.Algorithms.Implementations
     public sealed class HornerPolynomial : IAlgorithm<double[]>
     {
         public string Code => "horner-polynomial";
-
+        public string Name => "Horner Polynomial";
         public void Execute(double[] input)
         {
             double result = input[input.Length - 1];

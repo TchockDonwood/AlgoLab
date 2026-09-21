@@ -2,10 +2,10 @@
 
 namespace AlgoLab.Algorithms.Implementations
 {
-    public sealed class BubbleSort : IAlgorithm
+    public sealed class BubbleSort : IAlgorithm<int[]>
     {
         public string Code => "bubble-sort";
-
+        public string Name => "Bubble Sort";
         public void Execute(int[] input)
         {
             for (int i = 0; i < input.Length - 1; i++)

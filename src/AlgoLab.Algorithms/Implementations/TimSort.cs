@@ -6,7 +6,7 @@ namespace AlgoLab.Algorithms.Implementations
     public sealed class TimSort : IAlgorithm<double[]>
     {
         public string Code => "tim-sort";
-
+        public string Name => "Tim Sort";
         const int RUN = 32;
 
         public void Execute(double[] input)

@@ -5,6 +5,7 @@ namespace AlgoLab.Algorithms.Implementations
     public sealed class NaivePolynomial : IAlgorithm<double[]>
     {
         public string Code => "naive-polynomial";
+        public string Name => "Naive Polynomial";
 
         public void Execute(double[] input)
         {

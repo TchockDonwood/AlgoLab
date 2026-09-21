@@ -2,9 +2,10 @@
 
 namespace AlgoLab.Algorithms.Implementations
 {
-    public sealed class ConstFunction : IAlgorithm
+    public sealed class ConstFunction : IAlgorithm<int[]>
     {
         public string Code => "const-function";
+        public string Name => "Constant Function";
 
         public void Execute(int[] input)
         {
