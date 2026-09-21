@@ -1,0 +1,6 @@
+@AlgoLab.API_HostAddress = http://localhost:5163
+
+GET {{AlgoLab.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

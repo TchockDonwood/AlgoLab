@@ -1,0 +1,19 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/AlgoLab.Algorithms/AlgoLab.Algorithms.csproj" />
+  </Folder>
+  <Folder Name="/src/Core/">
+    <Project Path="src/Core/AlgoLab.Application/AlgoLab.Application.csproj" />
+    <Project Path="src/Core/AlgoLab.Domain/AlgoLab.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/Infrastructure/">
+    <Project Path="src/Infrastructure/AlgoLab.Infrastructure/AlgoLab.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Presentation/">
+    <Project Path="src/Presentation/AlgoLab.API/AlgoLab.API.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/AlgoLab.IntegrationTests/AlgoLab.IntegrationTests.csproj" />
+    <Project Path="tests/AlgoLab.UnitTests/AlgoLab.UnitTests.csproj" />
+  </Folder>
+</Solution>
