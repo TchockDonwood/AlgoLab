@@ -1,0 +1,79 @@
+﻿using AlgoLab.Application.Common.Interfaces;
+using AlgoLab.Application.DTOs;
+using Microsoft.EntityFrameworkCore;
+
+namespace AlgoLab.Application.Features.Benchmarks.GetComparison
+{
+    public class GetComparisonHandler
+    {
+        private readonly IApplicationDbContext _db;
+
+        public GetComparisonHandler(IApplicationDbContext db)
+        {
+            _db = db;
+        }
+
+        public async Task<IReadOnlyList<BenchmarkSeriesDto>> HandleAsync(
+            IReadOnlyCollection<Guid> sessionIds,
+            CancellationToken cancellationToken)
+        {
+            if (sessionIds.Count == 0)
+                return Array.Empty<BenchmarkSeriesDto>();
+
+            // Убираем дубли, сохраняем порядок
+            var orderedIds = sessionIds.Distinct().ToList();
+
+            // Один запрос: сессии + алгоритм + прогоны
+            var sessions = await _db.BenchmarkSessions
+                .AsNoTracking()
+                .Where(s => orderedIds.Contains(s.Id))
+                .Select(s => new
+                {
+                    s.Id,
+                    s.AlgorithmId,
+                    AlgorithmName = s.Algorithm.Name,
+                    Points = s.Runs
+                        .OrderBy(r => r.N)
+                        .Select(r => new BenchmarkPointDto(
+                            r.N,
+                            r.ExecutionTimeMs,
+                            r.StepsCount,
+                            r.FromCache
+                        ))
+                        .ToList()
+                })
+                .ToListAsync(cancellationToken);
+
+            // Индекс по SessionId для быстрого поиска
+            var byId = sessions.ToDictionary(s => s.Id);
+
+            // Собираем в порядке, в котором клиент передал sessionIds
+            var result = new List<BenchmarkSeriesDto>(orderedIds.Count);
+
+            foreach (var id in orderedIds)
+            {
+                if (byId.TryGetValue(id, out var s))
+                {
+                    result.Add(new BenchmarkSeriesDto(
+                        s.Id,
+                        s.AlgorithmId,
+                        s.AlgorithmName,
+                        s.Points
+                    ));
+                }
+                else
+                {
+                    // Сессии нет в БД — отдаём пустую серию
+                    result.Add(new BenchmarkSeriesDto(
+                        id,
+                        Guid.Empty,
+                        "Unknown",
+                        Array.Empty<BenchmarkPointDto>()
+                    ));
+                }
+            }
+
+            return result;
+        }
+    }
+}

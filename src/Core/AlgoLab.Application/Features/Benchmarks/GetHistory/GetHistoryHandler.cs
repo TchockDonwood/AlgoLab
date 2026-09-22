@@ -26,6 +26,8 @@ namespace AlgoLab.Application.Features.Benchmarks.GetHistory
                     x.Algorithm.Name,
                     x.StartN,
                     x.EndN,
+                    x.StartM,
+                    x.EndM,
                     x.Step,
                     x.Status.ToString(),
                     x.CreatedAt,

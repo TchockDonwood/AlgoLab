@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AlgoLab.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260921084500_InitialCreate")]
+    [Migration("20260922143613_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -36,9 +36,6 @@ namespace AlgoLab.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
-                    b.Property<string>("Description")
-                        .HasColumnType("text");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -50,6 +47,92 @@ namespace AlgoLab.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("algorithms", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-111111111111"),
+                            Code = "const-function",
+                            Name = "Const Function"
+                        },
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-111111111112"),
+                            Code = "sum-function",
+                            Name = "Sum Function"
+                        },
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-111111111113"),
+                            Code = "product-function",
+                            Name = "Product Function"
+                        },
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-111111111114"),
+                            Code = "naive-polynomial",
+                            Name = "Naive Polynomial"
+                        },
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-111111111115"),
+                            Code = "horner-polynomial",
+                            Name = "Horner Polynomial"
+                        },
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-111111111116"),
+                            Code = "bubble-sort",
+                            Name = "Bubble Sort"
+                        },
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-111111111117"),
+                            Code = "quick-sort",
+                            Name = "Quick Sort"
+                        },
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-111111111118"),
+                            Code = "tim-sort",
+                            Name = "Tim Sort"
+                        },
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-111111111119"),
+                            Code = "multiply-matrix",
+                            Name = "Matrix Multiplication"
+                        },
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-11111111111a"),
+                            Code = "smooth-sort",
+                            Name = "Smooth Sort"
+                        },
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-11111111111b"),
+                            Code = "sieve-of-eratosthenes",
+                            Name = "Sieve of Eratosthenes"
+                        },
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-11111111111c"),
+                            Code = "simple-pow",
+                            Name = "Simple Pow"
+                        },
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-11111111111d"),
+                            Code = "recursive-pow",
+                            Name = "Recursive Pow"
+                        },
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-11111111111e"),
+                            Code = "quick-recursive-pow",
+                            Name = "Quick Recursive Pow"
+                        });
                 });
 
             modelBuilder.Entity("AlgoLab.Domain.Entities.BenchmarkRun", b =>
@@ -70,6 +153,9 @@ namespace AlgoLab.Infrastructure.Migrations
                     b.Property<int>("N")
                         .HasColumnType("integer");
 
+                    b.Property<long?>("StepsCount")
+                        .HasColumnType("bigint");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -83,20 +169,18 @@ namespace AlgoLab.Infrastructure.Migrations
 
             modelBuilder.Entity("AlgoLab.Domain.Entities.BenchmarkSession", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("uuid");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<long>("AlgorithmId")
-                        .HasColumnType("bigint");
-
-                    b.Property<Guid>("AlgorithmId1")
+                    b.Property<Guid>("AlgorithmId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("EndM")
+                        .HasColumnType("integer");
 
                     b.Property<int>("EndN")
                         .HasColumnType("integer");
@@ -109,6 +193,9 @@ namespace AlgoLab.Infrastructure.Migrations
 
                     b.Property<bool>("ForceRecalculate")
                         .HasColumnType("boolean");
+
+                    b.Property<int?>("StartM")
+                        .HasColumnType("integer");
 
                     b.Property<int>("StartN")
                         .HasColumnType("integer");
@@ -124,7 +211,7 @@ namespace AlgoLab.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AlgorithmId1");
+                    b.HasIndex("AlgorithmId");
 
                     b.ToTable("BenchmarkSessions");
                 });
@@ -138,7 +225,7 @@ namespace AlgoLab.Infrastructure.Migrations
                     b.Property<Guid>("BenchmarkRunId")
                         .HasColumnType("uuid");
 
-                    b.Property<double>("ExecutionTimeMs")
+                    b.Property<double?>("ExecutionTimeMs")
                         .HasColumnType("double precision");
 
                     b.Property<bool>("FromCache")
@@ -150,14 +237,14 @@ namespace AlgoLab.Infrastructure.Migrations
                     b.Property<Guid>("SessionId")
                         .HasColumnType("uuid");
 
-                    b.Property<long>("SessionId1")
+                    b.Property<long?>("StepsCount")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
                     b.HasIndex("BenchmarkRunId");
 
-                    b.HasIndex("SessionId1");
+                    b.HasIndex("SessionId");
 
                     b.ToTable("SessionRuns");
                 });
@@ -177,7 +264,7 @@ namespace AlgoLab.Infrastructure.Migrations
                 {
                     b.HasOne("AlgoLab.Domain.Entities.Algorithm", "Algorithm")
                         .WithMany()
-                        .HasForeignKey("AlgorithmId1")
+                        .HasForeignKey("AlgorithmId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -194,7 +281,7 @@ namespace AlgoLab.Infrastructure.Migrations
 
                     b.HasOne("AlgoLab.Domain.Entities.BenchmarkSession", "Session")
                         .WithMany("Runs")
-                        .HasForeignKey("SessionId1")
+                        .HasForeignKey("SessionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

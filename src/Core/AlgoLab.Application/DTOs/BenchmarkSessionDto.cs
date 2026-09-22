@@ -6,6 +6,8 @@
         string AlgorithmName,
         int StartN,
         int EndN,
+        int? StartM,
+        int? EndM,
         int Step,
         string Status,
         DateTime CreatedAt,

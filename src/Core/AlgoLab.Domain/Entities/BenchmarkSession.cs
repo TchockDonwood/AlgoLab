@@ -9,6 +9,8 @@ namespace AlgoLab.Domain.Entities
         public Algorithm Algorithm { get; set; } = null!;
         public int StartN { get; set; }
         public int EndN { get; set; }
+        public int? StartM { get; set; }
+        public int? EndM { get; set; }
         public int Step { get; set; }
         public SessionStatus Status { get; set; }
         public bool ForceRecalculate { get; set; }

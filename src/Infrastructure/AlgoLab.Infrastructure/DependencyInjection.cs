@@ -1,8 +1,14 @@
-﻿using AlgoLab.Application.Common.Interfaces;
+﻿using AlgoLab.Algorithms;
+using AlgoLab.Algorithms.Implementations;
+using AlgoLab.Application.Common.Interfaces;
+using AlgoLab.Application.Features.Algorithms.GetAlgorithms;
+using AlgoLab.Application.Features.Benchmarks.CancelBenchmark;
+using AlgoLab.Application.Features.Benchmarks.GetComparison;
+using AlgoLab.Application.Features.Benchmarks.GetHistory;
+using AlgoLab.Application.Features.Benchmarks.GetSessionDetails;
+using AlgoLab.Application.Features.Benchmarks.StartBenchmark;
 using AlgoLab.Infrastructure.Benchmarking;
 using AlgoLab.Infrastructure.Benchmarking.Generators;
-using AlgoLab.Algorithms;
-using AlgoLab.Algorithms.Implementations;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AlgoLab.Infrastructure
@@ -20,6 +26,7 @@ namespace AlgoLab.Infrastructure
             services.AddSingleton<IBenchmarkRunner, BenchmarkRunner>();
 
             services.AddSingleton<IBenchmarkQueue, BenchmarkQueue>();
+            services.AddScoped<IBenchmarkResultStore, BenchmarkResultStore>();
             services.AddScoped<IBenchmarkExecutor, BenchmarkExecutor>();
             services.AddHostedService<BenchmarkWorker>();
 
@@ -45,6 +52,18 @@ namespace AlgoLab.Infrastructure
             services.AddSingleton<IAlgorithm, QuickRecursivePow>();
 
             services.AddSingleton<IAlgorithmRegistry, AlgorithmRegistry>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddApplication(this IServiceCollection services)
+        {
+            services.AddScoped<StartBenchmarkHandler>();
+            services.AddScoped<CancelBenchmarkHandler>();
+            services.AddScoped<GetHistoryHandler>();
+            services.AddScoped<GetSessionDetailsHandler>();
+            services.AddScoped<GetComparisonHandler>();
+            services.AddScoped<GetAlgorithmsHandler>();
 
             return services;
         }

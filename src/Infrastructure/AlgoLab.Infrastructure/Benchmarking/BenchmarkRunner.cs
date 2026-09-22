@@ -6,6 +6,7 @@ namespace AlgoLab.Infrastructure.Benchmarking;
 
 public class BenchmarkRunner : IBenchmarkRunner
 {
+    private const int MAX_RUNS = 5;
     private readonly IDataGeneratorRegistry _generators;
 
     public BenchmarkRunner(IDataGeneratorRegistry generators)
@@ -22,8 +23,11 @@ public class BenchmarkRunner : IBenchmarkRunner
         var seed = Random.Shared.Next();
 
         // Warm-up
-        algorithm.Execute(Generate(generator, request));
-        cancellationToken.ThrowIfCancellationRequested();
+        for (var i = 0; i < MAX_RUNS; i++)
+        {
+            algorithm.Execute(Generate(generator, request));
+            cancellationToken.ThrowIfCancellationRequested();
+        }
 
         var data = Generate(generator, request);
 
