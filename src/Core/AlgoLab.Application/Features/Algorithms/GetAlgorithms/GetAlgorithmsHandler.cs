@@ -22,7 +22,8 @@ namespace AlgoLab.Application.Features.Algorithms.GetAlgorithms
                 .Select(a => new AlgorithmDto(
                     a.Id,
                     a.Code,
-                    a.Name
+                    a.Name,
+                    a.InputArity
                 ))
                 .ToListAsync(cancellationToken);
         }

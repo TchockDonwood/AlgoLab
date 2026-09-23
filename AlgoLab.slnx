@@ -12,8 +12,4 @@
   <Folder Name="/src/Presentation/">
     <Project Path="src/Presentation/AlgoLab.API/AlgoLab.API.csproj" />
   </Folder>
-  <Folder Name="/tests/">
-    <Project Path="tests/AlgoLab.IntegrationTests/AlgoLab.IntegrationTests.csproj" />
-    <Project Path="tests/AlgoLab.UnitTests/AlgoLab.UnitTests.csproj" />
-  </Folder>
 </Solution>

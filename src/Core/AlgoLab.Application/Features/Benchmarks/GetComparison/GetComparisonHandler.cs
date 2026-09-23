@@ -20,10 +20,8 @@ namespace AlgoLab.Application.Features.Benchmarks.GetComparison
             if (sessionIds.Count == 0)
                 return Array.Empty<BenchmarkSeriesDto>();
 
-            // Убираем дубли, сохраняем порядок
             var orderedIds = sessionIds.Distinct().ToList();
 
-            // Один запрос: сессии + алгоритм + прогоны
             var sessions = await _db.BenchmarkSessions
                 .AsNoTracking()
                 .Where(s => orderedIds.Contains(s.Id))
@@ -34,22 +32,22 @@ namespace AlgoLab.Application.Features.Benchmarks.GetComparison
                     AlgorithmName = s.Algorithm.Name,
                     Points = s.Runs
                         .OrderBy(r => r.N)
+                        .ThenBy(r => r.M)
                         .Select(r => new BenchmarkPointDto(
                             r.N,
+                            r.M,
                             r.ExecutionTimeMs,
                             r.StepsCount,
-                            r.FromCache
+                            r.FromCache,
+                            r.IsOutlier
                         ))
                         .ToList()
                 })
                 .ToListAsync(cancellationToken);
 
-            // Индекс по SessionId для быстрого поиска
             var byId = sessions.ToDictionary(s => s.Id);
 
-            // Собираем в порядке, в котором клиент передал sessionIds
             var result = new List<BenchmarkSeriesDto>(orderedIds.Count);
-
             foreach (var id in orderedIds)
             {
                 if (byId.TryGetValue(id, out var s))
@@ -63,7 +61,6 @@ namespace AlgoLab.Application.Features.Benchmarks.GetComparison
                 }
                 else
                 {
-                    // Сессии нет в БД — отдаём пустую серию
                     result.Add(new BenchmarkSeriesDto(
                         id,
                         Guid.Empty,
@@ -72,7 +69,6 @@ namespace AlgoLab.Application.Features.Benchmarks.GetComparison
                     ));
                 }
             }
-
             return result;
         }
     }

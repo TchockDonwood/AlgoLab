@@ -12,6 +12,7 @@ namespace AlgoLab.Domain.Entities
         public int? StartM { get; set; }
         public int? EndM { get; set; }
         public int Step { get; set; }
+        public string? ApproximationModel { get; set; }
         public SessionStatus Status { get; set; }
         public bool ForceRecalculate { get; set; }
         public DateTime CreatedAt { get; set; }

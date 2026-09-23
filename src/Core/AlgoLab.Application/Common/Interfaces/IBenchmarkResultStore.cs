@@ -7,6 +7,7 @@ namespace AlgoLab.Application.Common.Interfaces
         Task<BenchmarkRun?> GetAsync(
             Guid algorithmId,
             int n,
+            int? m,
             CancellationToken cancellationToken);
 
         Task SaveAsync(

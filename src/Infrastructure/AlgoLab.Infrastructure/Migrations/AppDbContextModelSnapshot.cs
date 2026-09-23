@@ -33,6 +33,9 @@ namespace AlgoLab.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<int>("InputArity")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -50,85 +53,106 @@ namespace AlgoLab.Infrastructure.Migrations
                         {
                             Id = new Guid("11111111-1111-1111-1111-111111111111"),
                             Code = "const-function",
-                            Name = "Const Function"
+                            InputArity = 1,
+                            Name = "Константная функция"
                         },
                         new
                         {
                             Id = new Guid("11111111-1111-1111-1111-111111111112"),
                             Code = "sum-function",
-                            Name = "Sum Function"
+                            InputArity = 1,
+                            Name = "Сумма элементов"
                         },
                         new
                         {
                             Id = new Guid("11111111-1111-1111-1111-111111111113"),
                             Code = "product-function",
-                            Name = "Product Function"
+                            InputArity = 1,
+                            Name = "Произведение элементов"
                         },
                         new
                         {
                             Id = new Guid("11111111-1111-1111-1111-111111111114"),
                             Code = "naive-polynomial",
-                            Name = "Naive Polynomial"
+                            InputArity = 1,
+                            Name = "Наивный полином"
                         },
                         new
                         {
                             Id = new Guid("11111111-1111-1111-1111-111111111115"),
                             Code = "horner-polynomial",
-                            Name = "Horner Polynomial"
+                            InputArity = 1,
+                            Name = "Схема Горнера"
                         },
                         new
                         {
                             Id = new Guid("11111111-1111-1111-1111-111111111116"),
                             Code = "bubble-sort",
-                            Name = "Bubble Sort"
+                            InputArity = 1,
+                            Name = "Сортировка пузырьком"
                         },
                         new
                         {
                             Id = new Guid("11111111-1111-1111-1111-111111111117"),
                             Code = "quick-sort",
-                            Name = "Quick Sort"
+                            InputArity = 1,
+                            Name = "Быстрая сортировка"
                         },
                         new
                         {
                             Id = new Guid("11111111-1111-1111-1111-111111111118"),
                             Code = "tim-sort",
-                            Name = "Tim Sort"
+                            InputArity = 1,
+                            Name = "Timsort"
                         },
                         new
                         {
                             Id = new Guid("11111111-1111-1111-1111-111111111119"),
                             Code = "multiply-matrix",
-                            Name = "Matrix Multiplication"
+                            InputArity = 2,
+                            Name = "Умножение матриц"
                         },
                         new
                         {
                             Id = new Guid("11111111-1111-1111-1111-11111111111a"),
                             Code = "smooth-sort",
-                            Name = "Smooth Sort"
+                            InputArity = 1,
+                            Name = "Плавная сортировка"
                         },
                         new
                         {
                             Id = new Guid("11111111-1111-1111-1111-11111111111b"),
                             Code = "sieve-of-eratosthenes",
-                            Name = "Sieve of Eratosthenes"
+                            InputArity = 1,
+                            Name = "Решето Эратосфена"
                         },
                         new
                         {
                             Id = new Guid("11111111-1111-1111-1111-11111111111c"),
                             Code = "simple-pow",
-                            Name = "Simple Pow"
+                            InputArity = 1,
+                            Name = "Простое возведение в степень"
                         },
                         new
                         {
                             Id = new Guid("11111111-1111-1111-1111-11111111111d"),
                             Code = "recursive-pow",
-                            Name = "Recursive Pow"
+                            InputArity = 1,
+                            Name = "Рекурсивное возведение в степень"
                         },
                         new
                         {
                             Id = new Guid("11111111-1111-1111-1111-11111111111e"),
                             Code = "quick-recursive-pow",
-                            Name = "Quick Recursive Pow"
+                            InputArity = 1,
+                            Name = "Быстрое рекурсивное возведение в степень"
+                        },
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-11111111111f"),
+                            Code = "atkin-sieve",
+                            InputArity = 1,
+                            Name = "Решето Аткина"
                         });
                 });
 
@@ -147,6 +171,9 @@ namespace AlgoLab.Infrastructure.Migrations
                     b.Property<double>("ExecutionTimeMs")
                         .HasColumnType("double precision");
 
+                    b.Property<int?>("M")
+                        .HasColumnType("integer");
+
                     b.Property<int>("N")
                         .HasColumnType("integer");
 
@@ -158,7 +185,7 @@ namespace AlgoLab.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AlgorithmId", "N")
+                    b.HasIndex("AlgorithmId", "N", "M")
                         .IsUnique();
 
                     b.ToTable("benchmark_runs", (string)null);
@@ -172,6 +199,9 @@ namespace AlgoLab.Infrastructure.Migrations
 
                     b.Property<Guid>("AlgorithmId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("ApproximationModel")
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -227,6 +257,12 @@ namespace AlgoLab.Infrastructure.Migrations
 
                     b.Property<bool>("FromCache")
                         .HasColumnType("boolean");
+
+                    b.Property<bool>("IsOutlier")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("M")
+                        .HasColumnType("integer");
 
                     b.Property<int>("N")
                         .HasColumnType("integer");

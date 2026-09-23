@@ -3,6 +3,7 @@
     public record AlgorithmDto(
         Guid Id,
         string Code,
-        string Name
+        string Name,
+        int InputArity
     );
 }

@@ -9,8 +9,11 @@ namespace AlgoLab.Algorithms.Implementations
         public string Name => "Quick Sort";
         public void Execute(double[] input)
         {
+            if (input == null || input.Length <= 1)
+                return;
+
             var start = 0;
-            var end = input.Length;
+            var end = input.Length - 1;
             Sort(input, start, end);
         }
 

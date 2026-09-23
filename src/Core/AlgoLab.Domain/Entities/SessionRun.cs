@@ -8,8 +8,10 @@
         public Guid BenchmarkRunId { get; set; }
         public BenchmarkRun BenchmarkRun { get; set; } = null!;
         public int N { get; set; }
+        public int? M { get; set; }
         public double? ExecutionTimeMs { get; set; }
         public long? StepsCount { get; set; }
         public bool FromCache { get; set; }
+        public bool IsOutlier { get; set; }
     }
 }

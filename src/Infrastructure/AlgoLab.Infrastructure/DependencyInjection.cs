@@ -17,15 +17,17 @@ namespace AlgoLab.Infrastructure
     {
         public static IServiceCollection AddBenchmarking(this IServiceCollection services)
         {
-            // Генераторы — по одному на каждый тип входа
             services.AddSingleton<IDataGenerator, IntArrayGenerator>();
             services.AddSingleton<IDataGenerator, DoubleArrayGenerator>();
             services.AddSingleton<IDataGenerator, MatrixPairGenerator>();
-
+            services.AddSingleton<IDataGenerator, PowInputGenerator>();
+            services.AddSingleton<IDataGenerator, UIntGenerator>();
+            services.AddSingleton<IDataGenerator, LongGenerator>();
             services.AddSingleton<IDataGeneratorRegistry, DataGeneratorRegistry>();
             services.AddSingleton<IBenchmarkRunner, BenchmarkRunner>();
-
             services.AddSingleton<IBenchmarkQueue, BenchmarkQueue>();
+            services.AddSingleton<IBenchmarkCancellationManager, BenchmarkCancellationManager>();
+            services.AddSingleton<IBenchmarkStatisticsService, BenchmarkStatistics>();
             services.AddScoped<IBenchmarkResultStore, BenchmarkResultStore>();
             services.AddScoped<IBenchmarkExecutor, BenchmarkExecutor>();
             services.AddHostedService<BenchmarkWorker>();
@@ -46,11 +48,10 @@ namespace AlgoLab.Infrastructure
             services.AddSingleton<IAlgorithm, MultiplyMatrix>();
             services.AddSingleton<IAlgorithm, SmoothSort>();
             services.AddSingleton<IAlgorithm, SieveOfEratosthenes>();
-            //services.AddSingleton<IAlgorithm, >();
+            services.AddSingleton<IAlgorithm, AtkinSieve>();
             services.AddSingleton<IAlgorithm, SimplePow>();
             services.AddSingleton<IAlgorithm, RecursivePow>();
             services.AddSingleton<IAlgorithm, QuickRecursivePow>();
-
             services.AddSingleton<IAlgorithmRegistry, AlgorithmRegistry>();
 
             return services;

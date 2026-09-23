@@ -2,8 +2,10 @@
 {
     public record BenchmarkPointDto(
         int N,
+        int? M,
         double? ExecutionTimeMs,
         long? Steps,
-        bool FromCache
+        bool FromCache,
+        bool IsOutlier
     );
 }

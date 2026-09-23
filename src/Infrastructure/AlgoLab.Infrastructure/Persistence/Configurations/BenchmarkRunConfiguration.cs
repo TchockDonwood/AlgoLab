@@ -6,7 +6,7 @@ namespace AlgoLab.Infrastructure.Persistence.Configurations
 {
     public class BenchmarkRunConfiguration : IEntityTypeConfiguration<BenchmarkRun>
     {
-        public void Configure(EntityTypeBuilder<BenchmarkRun> builder) 
+        public void Configure(EntityTypeBuilder<BenchmarkRun> builder)
         {
             builder.ToTable("benchmark_runs");
 
@@ -15,12 +15,9 @@ namespace AlgoLab.Infrastructure.Persistence.Configurations
             builder.Property(x => x.ExecutionTimeMs)
                 .IsRequired();
 
-            builder.HasIndex(x => new
-            {
-                x.AlgorithmId,
-                x.N
-            })
-            .IsUnique();
+            // ОБНОВЛЕННЫЙ ИНДЕКС: теперь включает M
+            builder.HasIndex(x => new { x.AlgorithmId, x.N, x.M })
+                .IsUnique();
 
             builder.HasOne(x => x.Algorithm)
                 .WithMany()

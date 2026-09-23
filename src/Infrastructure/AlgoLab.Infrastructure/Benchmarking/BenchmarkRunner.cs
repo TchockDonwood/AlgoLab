@@ -1,41 +1,46 @@
 ﻿using AlgoLab.Application.Common.Interfaces;
 using AlgoLab.Application.Common.Models;
 using System.Diagnostics;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AlgoLab.Infrastructure.Benchmarking;
 
 public class BenchmarkRunner : IBenchmarkRunner
 {
-    private const int MAX_RUNS = 5;
+    private const int REPETITIONS = 5;
     private readonly IDataGeneratorRegistry _generators;
+    private readonly IBenchmarkStatisticsService _statistics;
 
-    public BenchmarkRunner(IDataGeneratorRegistry generators)
-        => _generators = generators;
+    public BenchmarkRunner(
+        IDataGeneratorRegistry generators,
+        IBenchmarkStatisticsService statistics)
+    {
+        _generators = generators;
+        _statistics = statistics;
+    }
 
     public Task<BenchmarkResult> MeasureAsync(
-        IAlgorithm algorithm,
-        GenerationRequest request,
-        CancellationToken cancellationToken)
+    IAlgorithm algorithm,
+    GenerationRequest request,
+    CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-
         var generator = _generators.GetFor(algorithm.InputType);
-        var seed = Random.Shared.Next();
 
         // Warm-up
-        for (var i = 0; i < MAX_RUNS; i++)
+        for (var i = 0; i < 3; i++)
         {
             algorithm.Execute(Generate(generator, request));
             cancellationToken.ThrowIfCancellationRequested();
         }
 
         var data = Generate(generator, request);
-
         BenchmarkResult result;
 
         if (algorithm is IStepAlgorithm stepAlgorithm)
         {
-            result = BenchmarkResult.FromSteps(stepAlgorithm.ExecuteCountingSteps(data));
+            var steps = stepAlgorithm.ExecuteCountingSteps(data);
+            result = new BenchmarkResult(0.0, steps);
         }
         else
         {

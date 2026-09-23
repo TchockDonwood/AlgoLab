@@ -13,80 +13,64 @@ namespace AlgoLab.Infrastructure.Benchmarking
         private readonly IBenchmarkResultStore _resultStore;
         private readonly IBenchmarkRunner _runner;
         private readonly IAlgorithmRegistry _algorithms;
+        private readonly IBenchmarkCancellationManager _cancellationManager;
+        private readonly IBenchmarkStatisticsService _statistics;
 
         public BenchmarkExecutor(
             AppDbContext db,
             IBenchmarkResultStore resultStore,
             IBenchmarkRunner runner,
-            IAlgorithmRegistry algorithms)
+            IAlgorithmRegistry algorithms,
+            IBenchmarkCancellationManager cancellationManager,
+            IBenchmarkStatisticsService statistics)
         {
             _db = db;
             _resultStore = resultStore;
             _runner = runner;
             _algorithms = algorithms;
+            _cancellationManager = cancellationManager;
+            _statistics = statistics;
         }
 
         public async Task ExecuteAsync(
             Guid sessionId,
             CancellationToken cancellationToken)
         {
-            // 1. Получить сессию
+            var sessionToken = _cancellationManager.GetToken(sessionId);
+            using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, sessionToken);
+            var ct = linkedCts.Token;
 
-            // 2. Проверить, не отменена ли она
-
-            // 3. Поставить RUNNING
-
-            // 4. Получить algorithm
-
-            // 5. Найти реализацию в registry
-
-            // 6. Цикл N
-
-            // 7. Проверить cache
-
-            // 8. Если cache нет → запустить algorithm
-
-            // 9. Создать SessionRun
-
-            // 10. COMPLETED
-
-
-            // 1. Получить сессию
             var session = await _db.BenchmarkSessions
                 .Include(s => s.Algorithm)
-                .FirstOrDefaultAsync(s => s.Id == sessionId, cancellationToken);
+                .FirstOrDefaultAsync(s => s.Id == sessionId, ct);
 
             if (session is null)
                 return;
 
-            // 2. Проверить, не отменена ли она
             if (session.Status == SessionStatus.Cancelled)
                 return;
 
-            // 3. Поставить RUNNING
             session.Status = SessionStatus.Running;
             session.StartedAt = DateTime.UtcNow;
             session.FinishedAt = null;
             session.ErrorMessage = null;
-            await _db.SaveChangesAsync(cancellationToken);
+            await _db.SaveChangesAsync(ct);
 
             try
             {
-                // 4. Получить algorithm
                 var algorithmEntity = session.Algorithm
                     ?? await _db.Algorithms.FirstOrDefaultAsync(
-                        a => a.Id == session.AlgorithmId, cancellationToken);
+                        a => a.Id == session.AlgorithmId, ct);
 
                 if (algorithmEntity is null)
                 {
                     session.Status = SessionStatus.Failed;
                     session.ErrorMessage = $"Algorithm with id {session.AlgorithmId} not found.";
                     session.FinishedAt = DateTime.UtcNow;
-                    await _db.SaveChangesAsync(cancellationToken);
+                    await _db.SaveChangesAsync(CancellationToken.None);
                     return;
                 }
 
-                // 5. Найти реализацию в registry
                 IAlgorithm algorithmImpl;
                 try
                 {
@@ -97,82 +81,70 @@ namespace AlgoLab.Infrastructure.Benchmarking
                     session.Status = SessionStatus.Failed;
                     session.ErrorMessage = $"Algorithm implementation '{algorithmEntity.Code}' not found: {ex.Message}";
                     session.FinishedAt = DateTime.UtcNow;
-                    await _db.SaveChangesAsync(cancellationToken);
+                    await _db.SaveChangesAsync(CancellationToken.None);
                     return;
                 }
 
-                // 6. Цикл N
+                var ns = new List<int>();
+                var ms = new List<int>();
+                var times = new List<double>();
+                var sessionRuns = new List<SessionRun>();
+
+                bool is2D = algorithmEntity.InputArity == 2;
+                int startM = session.StartM ?? 1;
+                int endM = session.EndM ?? session.EndN;
+
                 for (var n = session.StartN; n <= session.EndN; n += session.Step)
                 {
-                    // 7. Проверить cache
-                    var cachedRun = await _resultStore.GetAsync(
-                        session.AlgorithmId, n, cancellationToken);
+                    ct.ThrowIfCancellationRequested();
 
-                    BenchmarkRun benchmarkRun;
-                    bool fromCache;
-
-                    if (cachedRun is not null && !session.ForceRecalculate)
+                    if (is2D)
                     {
-                        // Используем кэш
-                        benchmarkRun = cachedRun;
-                        fromCache = true;
+                        for (var m = startM; m <= endM; m += session.Step)
+                        {
+                            ct.ThrowIfCancellationRequested();
+                            await ProcessPoint(session, algorithmImpl, algorithmEntity.Id, n, m, ct, ns, ms, times, sessionRuns);
+                        }
                     }
                     else
                     {
-                        // 8. Если cache нет → запустить algorithm
-                        var m = n; // предполагаем M = N для двумерных
-                        var seed = Random.Shared.Next();
-                        var request = GenerationRequest.Pair(n, m, seed);
-
-                        var result = await _runner.MeasureAsync(
-                            algorithmImpl, request, cancellationToken);
-
-                        if (cachedRun is not null) // ForceRecalculate = true
-                        {
-                            cachedRun.ExecutionTimeMs = result.TimeMs;
-                            cachedRun.StepsCount = result.Steps;
-                            cachedRun.UpdatedAt = DateTime.UtcNow;
-                            benchmarkRun = cachedRun;
-                        }
-                        else
-                        {
-                            benchmarkRun = new BenchmarkRun
-                            {
-                                Id = Guid.NewGuid(),
-                                AlgorithmId = session.AlgorithmId,
-                                N = n,
-                                ExecutionTimeMs = result.TimeMs,
-                                StepsCount = result.Steps,
-                                CreatedAt = DateTime.UtcNow,
-                                UpdatedAt = DateTime.UtcNow
-                            };
-                            _db.BenchmarkRuns.Add(benchmarkRun);
-                        }
-
-                        await _db.SaveChangesAsync(cancellationToken);
-                        fromCache = false;
+                        await ProcessPoint(session, algorithmImpl, algorithmEntity.Id, n, null, ct, ns, ms, times, sessionRuns);
                     }
-
-                    // 9. Создать SessionRun
-                    var sessionRun = new SessionRun
-                    {
-                        Id = Guid.NewGuid(),
-                        SessionId = session.Id,
-                        BenchmarkRunId = benchmarkRun.Id,
-                        N = n,
-                        ExecutionTimeMs = benchmarkRun.ExecutionTimeMs,
-                        StepsCount = benchmarkRun.StepsCount,
-                        FromCache = fromCache
-                    };
-
-                    _db.SessionRuns.Add(sessionRun);
-                    await _db.SaveChangesAsync(cancellationToken);
                 }
 
-                // 10. COMPLETED
+                // Фильтрация выбросов и аппроксимация (только для 1D)
+                if (!is2D && times.Count > 0)
+                {
+                    var (filteredNs, filteredTimes, _, originalIndices) =
+                        _statistics.FilterIqrOutliers(ns, times, ms);
+
+                    // Помечаем выбросы
+                    for (int i = 0; i < sessionRuns.Count; i++)
+                    {
+                        sessionRuns[i].IsOutlier = !originalIndices.Contains(i);
+                    }
+
+                    // Аппроксимация только по отфильтрованным данным
+                    if (filteredTimes.Count >= 2)
+                    {
+                        var (modelName, fitTimes) = _statistics.FindBestFitModel(filteredNs, filteredTimes);
+                        session.ApproximationModel = modelName;
+
+                        // Сохраняем точки аппроксимации (можно добавить в БД при необходимости)
+                    }
+                }
+
+                await _db.SaveChangesAsync(CancellationToken.None);
+
                 session.Status = SessionStatus.Completed;
                 session.FinishedAt = DateTime.UtcNow;
-                await _db.SaveChangesAsync(cancellationToken);
+                await _db.SaveChangesAsync(CancellationToken.None);
+            }
+            catch (OperationCanceledException)
+            {
+                session.Status = SessionStatus.Cancelled;
+                session.FinishedAt = DateTime.UtcNow;
+                await _db.SaveChangesAsync(CancellationToken.None);
             }
             catch (Exception ex)
             {
@@ -182,6 +154,88 @@ namespace AlgoLab.Infrastructure.Benchmarking
                 await _db.SaveChangesAsync(CancellationToken.None);
                 throw;
             }
+            finally
+            {
+                _cancellationManager.Complete(sessionId);
+            }
+        }
+
+        private async Task ProcessPoint(
+            BenchmarkSession session,
+            IAlgorithm algorithmImpl,
+            Guid algorithmId,
+            int n,
+            int? m,
+            CancellationToken ct,
+            List<int> ns,
+            List<int> ms,
+            List<double> times,
+            List<SessionRun> sessionRuns)
+        {
+            var cachedRun = await _resultStore.GetAsync(algorithmId, n, m, ct);
+            BenchmarkRun benchmarkRun;
+            bool fromCache;
+
+            if (cachedRun is not null && !session.ForceRecalculate)
+            {
+                benchmarkRun = cachedRun;
+                fromCache = true;
+            }
+            else
+            {
+                var seed = Random.Shared.Next();
+                var request = m.HasValue
+                    ? GenerationRequest.Pair(n, m.Value, seed)
+                    : GenerationRequest.Single(n, seed);
+
+                var result = await _runner.MeasureAsync(algorithmImpl, request, ct);
+
+                if (cachedRun is not null)
+                {
+                    cachedRun.ExecutionTimeMs = result.TimeMs;
+                    cachedRun.StepsCount = result.Steps;
+                    cachedRun.UpdatedAt = DateTime.UtcNow;
+                    benchmarkRun = cachedRun;
+                }
+                else
+                {
+                    benchmarkRun = new BenchmarkRun
+                    {
+                        Id = Guid.NewGuid(),
+                        AlgorithmId = algorithmId,
+                        N = n,
+                        M = m,
+                        ExecutionTimeMs = result.TimeMs,
+                        StepsCount = result.Steps,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    };
+                    _db.BenchmarkRuns.Add(benchmarkRun);
+                }
+                await _db.SaveChangesAsync(ct);
+                fromCache = false;
+            }
+
+            var sessionRun = new SessionRun
+            {
+                Id = Guid.NewGuid(),
+                SessionId = session.Id,
+                BenchmarkRunId = benchmarkRun.Id,
+                N = n,
+                M = m,
+                ExecutionTimeMs = benchmarkRun.ExecutionTimeMs,
+                StepsCount = benchmarkRun.StepsCount,
+                FromCache = fromCache,
+                IsOutlier = false
+            };
+
+            _db.SessionRuns.Add(sessionRun);
+            await _db.SaveChangesAsync(ct);
+
+            sessionRuns.Add(sessionRun);
+            ns.Add(n);
+            ms.Add(m ?? 0);
+            times.Add(benchmarkRun.ExecutionTimeMs ?? 0);
         }
     }
 }

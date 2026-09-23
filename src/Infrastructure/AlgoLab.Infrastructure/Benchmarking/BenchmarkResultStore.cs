@@ -17,12 +17,14 @@ namespace AlgoLab.Infrastructure.Benchmarking
         public Task<BenchmarkRun?> GetAsync(
             Guid algorithmId,
             int n,
+            int? m,
             CancellationToken cancellationToken)
         {
             return _db.BenchmarkRuns
                 .FirstOrDefaultAsync(
                     x => x.AlgorithmId == algorithmId &&
-                         x.N == n,
+                         x.N == n &&
+                         x.M == m,
                     cancellationToken);
         }
 
@@ -31,7 +33,6 @@ namespace AlgoLab.Infrastructure.Benchmarking
             CancellationToken cancellationToken)
         {
             _db.BenchmarkRuns.Add(result);
-
             await _db.SaveChangesAsync(cancellationToken);
         }
     }
