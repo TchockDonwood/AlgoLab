@@ -211,39 +211,20 @@ Host=localhost;Port=5432;Database=algolab;Username=postgres;Password=postgres
 
 Если ваши креды отличаются — отредактируйте `src/Presentation/AlgoLab.API/appsettings.json`.
 
-### 2. Backend
-
 ```bash
 # Из корня репозитория
 cd src/Presentation/AlgoLab.API
 
 # Применяем миграции (создаст таблицы и засеет 15 алгоритмов)
 dotnet ef database update --project ../../Infrastructure/AlgoLab.Infrastructure
-
-# Запускаем API
-dotnet run
 ```
+
+### 2. Запуск проекта
+
+Запустите скрипт `run.bat` для запуска проекта.
 
 API поднимется на **http://localhost:5163**. Swagger — **http://localhost:5163/swagger** (доступен в Development).
-
-### 3. Frontend
-
-В новом терминале:
-
-```bash
-cd algo-lab-frontend
-
-# Установка зависимостей
-npm install
-
-# Запуск dev-сервера
-npm run dev
-```
-
-Откройте **http://localhost:5173** (Vite по умолчанию).
-
-> Если API работает на другом адресе — поправьте `baseURL` в `src/api/client.js`.
-
+Чтобы открыть сайт, зайдите на **http://localhost:5173** (Vite по умолчанию).
 ---
 
 ## API
