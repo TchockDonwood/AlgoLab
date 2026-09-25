@@ -28,7 +28,9 @@ export default function AlgorithmList({
                         }`}
                     >
                         <div className="algorithm-list-info">
-                            <div className="algorithm-list-name">{algorithm.name}</div>
+                            <div className="algorithm-list-name" title={algorithm.name}>
+                                {algorithm.name}
+                            </div>
                             {algorithm.code && (
                                 <div className="algorithm-list-code">{algorithm.code}</div>
                             )}
@@ -43,6 +45,7 @@ export default function AlgorithmList({
                             size="small"
                             disabled={isSelected}
                             onClick={() => onSelect(algorithm)}
+                            className="algorithm-list-action"
                         >
                             {isSelected ? "Выбрано" : "Выбрать"}
                         </Button>

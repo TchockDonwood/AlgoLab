@@ -129,16 +129,20 @@
 
 .algorithm-list {
   display: grid;
+
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+
   gap: 12px;
 }
 
 .algorithm-list-item {
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
-  align-items: center;
 
-  gap: 20px;
+  gap: 12px;
 
+  min-height: 148px;
   padding: 16px 18px;
 
   background: #f9fbfe;
@@ -168,6 +172,11 @@
 
 .algorithm-list-name {
   font-weight: 700;
+
+  /* чтобы длинные имена не раздували карточку */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .algorithm-list-code {
@@ -182,6 +191,10 @@
     monospace;
 
   font-size: 12px;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .algorithm-list-description {
@@ -190,6 +203,16 @@
   color: #6e7889;
   font-size: 13px;
   line-height: 1.45;
+
+  /* ограничиваем длину описания тремя строками */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.algorithm-list-action {
+  width: 100%;
 }
 
 .config-list {
@@ -621,6 +644,140 @@
 .comparison-option-meta {
   color: #788398;
   font-size: 12px;
+}
+
+.cell-truncate {
+  display: inline-block;
+
+  width: 35ch; 
+  max-width: 35ch;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  vertical-align: middle;
+}
+
+/* Фильтр */
+.history-filter-select {
+  width: 100%;
+
+  cursor: pointer;
+
+  appearance: none;
+  -webkit-appearance: none;
+
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='none' stroke='%23526178' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' d='M2.5 4.5L6 8l3.5-3.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 12px;
+
+  padding-right: 34px;
+
+   margin-bottom: 28px;
+}
+
+/* Группировка по дням */
+.history-day-group {
+  margin-bottom: 28px;
+}
+
+.history-day-group:last-child {
+  margin-bottom: 0;
+}
+
+.history-day-header {
+  display: flex;
+  align-items: baseline;
+
+  gap: 10px;
+
+  margin-bottom: 12px;
+  padding: 0 4px;
+
+  color: #4a5a76;
+
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.history-day-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 22px;
+  height: 20px;
+  padding: 0 7px;
+
+  border-radius: 999px;
+
+  background: #eef3fa;
+  color: #526178;
+
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* Партии запусков внутри дня */
+.history-batch {
+  margin-top: 14px;
+  margin-bottom: 14px;
+}
+
+.history-batch:last-child {
+  margin-bottom: 0;
+}
+
+.history-batch-header {
+  display: flex;
+  align-items: baseline;
+
+  gap: 8px;
+
+  margin: 0 0 8px;
+  padding: 0 4px;
+
+  color: #6a7689;
+
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.history-batch-time {
+  font-family:
+    "SFMono-Regular",
+    Consolas,
+    "Liberation Mono",
+    monospace;
+
+  color: #3d4d67;
+}
+
+.history-batch-count {
+  padding: 2px 8px;
+
+  border-radius: 999px;
+
+  background: #e8f1ff;
+  color: #2864c4;
+
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.history-expand {
+  display: flex;
+  justify-content: center;
+
+  margin-top: 12px;
+}
+
+.visualization-anchor {
+  scroll-margin-top: 90px;
 }
 
 @media (max-width: 900px) {

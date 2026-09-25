@@ -4,10 +4,10 @@ import Plotly from "plotly.js-dist-min";
 export default function SurfaceChart({ points = [], algorithmName }) {
   const chartRef = useRef(null);
 
+  // Основной эффект — построение графика
   useEffect(() => {
     if (!chartRef.current || !points.length) return;
 
-    // Фильтруем валидные точки (с временем)
     const validPoints = points.filter(
       (p) =>
         p.executionTimeMs !== null &&
@@ -17,13 +17,11 @@ export default function SurfaceChart({ points = [], algorithmName }) {
 
     if (validPoints.length === 0) return;
 
-    // Получаем уникальные значения N и M
     const ns = [...new Set(validPoints.map((p) => p.n))].sort((a, b) => a - b);
     const ms = [...new Set(validPoints.map((p) => p.m))].sort((a, b) => a - b);
 
     const axisTitle = (text) => ({ text, standoff: 12 });
 
-    // Если недостаточно данных для поверхности, показываем scatter3d
     if (ns.length < 2 || ms.length < 2) {
       const data = [
         {
@@ -48,8 +46,10 @@ export default function SurfaceChart({ points = [], algorithmName }) {
           xaxis: { title: axisTitle("Размер M") },
           yaxis: { title: axisTitle("Размер N") },
           zaxis: { title: axisTitle("Время (мс)") },
+          aspectmode: "auto",
+          camera: { eye: { x: -1.5, y: -1.5, z: 1.5 } },
         },
-        margin: { l: 60, r: 30, t: 70, b: 60 },
+        margin: { l: 60, r: 30, t: 70, b: 100 },
         paper_bgcolor: "transparent",
         plot_bgcolor: "transparent",
       };
@@ -64,11 +64,9 @@ export default function SurfaceChart({ points = [], algorithmName }) {
       };
     }
 
-    // Вычисляем среднее время для заполнения пропусков
     const allTimes = validPoints.map((p) => p.executionTimeMs);
     const avgTime = allTimes.reduce((sum, t) => sum + t, 0) / allTimes.length;
 
-    // Строим матрицу Z, заменяя пропуски средним значением
     const z = ns.map((n) =>
       ms.map((m) => {
         const point = validPoints.find((p) => p.n === n && p.m === m);
@@ -101,10 +99,10 @@ export default function SurfaceChart({ points = [], algorithmName }) {
         xaxis: { title: axisTitle("Размер M") },
         yaxis: { title: axisTitle("Размер N") },
         zaxis: { title: axisTitle("Время (мс)") },
-        aspectratio: { x: 1, y: 1, z: 0.7 },
+        aspectmode: "auto",
         camera: { eye: { x: -1.5, y: -1.5, z: 1.5 } },
       },
-      margin: { l: 60, r: 30, t: 70, b: 60 },
+      margin: { l: 60, r: 30, t: 70, b: 100 },
       paper_bgcolor: "transparent",
       plot_bgcolor: "transparent",
     };
@@ -117,6 +115,17 @@ export default function SurfaceChart({ points = [], algorithmName }) {
     return () => {
       if (chartRef.current) Plotly.purge(chartRef.current);
     };
+  }, [points, algorithmName]);
+
+  // Дополнительный эффект — форсируем пересчёт размеров после рендера
+  useEffect(() => {
+    if (!chartRef.current) return;
+
+    const raf = requestAnimationFrame(() => {
+      if (chartRef.current) Plotly.Plots.resize(chartRef.current);
+    });
+
+    return () => cancelAnimationFrame(raf);
   }, [points, algorithmName]);
 
   return (

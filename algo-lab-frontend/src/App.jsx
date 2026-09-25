@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getAlgorithms } from "./api/algorithms";
 import AlgorithmList from "./features/benchmark-configuration/components/AlgorithmList";
@@ -11,6 +11,7 @@ import "./App.css";
 
 export default function App() {
     const [selectedSessionId, setSelectedSessionId] = useState(null);
+    const visualizationRef = useRef(null);
 
     const {
         data: algorithms = [],
@@ -30,6 +31,20 @@ export default function App() {
         validationErrors,
         isValid,
     } = useBenchmarkConfig();
+
+    // Автоскролл к секции графиков при открытии сессии
+    useEffect(() => {
+        if (selectedSessionId === null) return;
+
+        const timer = setTimeout(() => {
+            visualizationRef.current?.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+            });
+        }, 60);
+
+        return () => clearTimeout(timer);
+    }, [selectedSessionId]);
 
     return (
         <div className="app">
@@ -133,10 +148,12 @@ export default function App() {
                 </section>
 
                 {selectedSessionId !== null && (
-                    <VisualizationPage
-                        sessionId={selectedSessionId}
-                        onClose={() => setSelectedSessionId(null)}
-                    />
+                    <div ref={visualizationRef} className="visualization-anchor">
+                        <VisualizationPage
+                            sessionId={selectedSessionId}
+                            onClose={() => setSelectedSessionId(null)}
+                        />
+                    </div>
                 )}
             </main>
         </div>
