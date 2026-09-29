@@ -1,7 +1,6 @@
 ﻿using AlgoLab.Application.Common.Interfaces;
 using AlgoLab.Application.Common.Models;
 using System.Diagnostics;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AlgoLab.Infrastructure.Benchmarking;
 
@@ -28,7 +27,7 @@ public class BenchmarkRunner : IBenchmarkRunner
         var generator = _generators.GetFor(algorithm.InputType);
 
         // Warm-up
-        for (var i = 0; i < 3; i++)
+        for (var i = 0; i < REPETITIONS; i++)
         {
             algorithm.Execute(Generate(generator, request));
             cancellationToken.ThrowIfCancellationRequested();

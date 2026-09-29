@@ -23,14 +23,18 @@ namespace AlgoLab.Infrastructure
             services.AddSingleton<IDataGenerator, PowInputGenerator>();
             services.AddSingleton<IDataGenerator, UIntGenerator>();
             services.AddSingleton<IDataGenerator, LongGenerator>();
+
             services.AddSingleton<IDataGeneratorRegistry, DataGeneratorRegistry>();
+            
             services.AddSingleton<IBenchmarkRunner, BenchmarkRunner>();
             services.AddSingleton<IBenchmarkQueue, BenchmarkQueue>();
             services.AddSingleton<IBenchmarkCancellationManager, BenchmarkCancellationManager>();
             services.AddSingleton<IBenchmarkStatisticsService, BenchmarkStatistics>();
             services.AddScoped<IBenchmarkResultStore, BenchmarkResultStore>();
             services.AddScoped<IBenchmarkExecutor, BenchmarkExecutor>();
+
             services.AddHostedService<BenchmarkWorker>();
+            services.AddHostedService<BenchmarkStartupRecoveryService>();
 
             return services;
         }
@@ -52,6 +56,7 @@ namespace AlgoLab.Infrastructure
             services.AddSingleton<IAlgorithm, SimplePow>();
             services.AddSingleton<IAlgorithm, RecursivePow>();
             services.AddSingleton<IAlgorithm, QuickRecursivePow>();
+            
             services.AddSingleton<IAlgorithmRegistry, AlgorithmRegistry>();
 
             return services;

@@ -27,13 +27,5 @@ namespace AlgoLab.Infrastructure.Benchmarking
                          x.M == m,
                     cancellationToken);
         }
-
-        public async Task SaveAsync(
-            BenchmarkRun result,
-            CancellationToken cancellationToken)
-        {
-            _db.BenchmarkRuns.Add(result);
-            await _db.SaveChangesAsync(cancellationToken);
-        }
     }
 }

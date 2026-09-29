@@ -9,12 +9,15 @@ namespace AlgoLab.Infrastructure.Benchmarking
 {
     public class BenchmarkExecutor : IBenchmarkExecutor
     {
+        private const int SaveBatchSize = 100;
+            
         private readonly AppDbContext _db;
         private readonly IBenchmarkResultStore _resultStore;
         private readonly IBenchmarkRunner _runner;
         private readonly IAlgorithmRegistry _algorithms;
         private readonly IBenchmarkCancellationManager _cancellationManager;
         private readonly IBenchmarkStatisticsService _statistics;
+        private int _pendingChanges;
 
         public BenchmarkExecutor(
             AppDbContext db,
@@ -112,6 +115,8 @@ namespace AlgoLab.Infrastructure.Benchmarking
                     }
                 }
 
+                await FlushAsync(CancellationToken.None);
+
                 // Фильтрация выбросов и аппроксимация (только для 1D)
                 if (!is2D && times.Count > 0)
                 {
@@ -129,8 +134,6 @@ namespace AlgoLab.Infrastructure.Benchmarking
                     {
                         var (modelName, fitTimes) = _statistics.FindBestFitModel(filteredNs, filteredTimes);
                         session.ApproximationModel = modelName;
-
-                        // Сохраняем точки аппроксимации (можно добавить в БД при необходимости)
                     }
                 }
 
@@ -212,7 +215,6 @@ namespace AlgoLab.Infrastructure.Benchmarking
                     };
                     _db.BenchmarkRuns.Add(benchmarkRun);
                 }
-                await _db.SaveChangesAsync(ct);
                 fromCache = false;
             }
 
@@ -230,12 +232,25 @@ namespace AlgoLab.Infrastructure.Benchmarking
             };
 
             _db.SessionRuns.Add(sessionRun);
-            await _db.SaveChangesAsync(ct);
+            _pendingChanges++;
+
+            if (_pendingChanges >= SaveBatchSize)
+            {
+                await _db.SaveChangesAsync(ct);
+                _pendingChanges = 0;
+            }
 
             sessionRuns.Add(sessionRun);
             ns.Add(n);
             ms.Add(m ?? 0);
             times.Add(benchmarkRun.ExecutionTimeMs ?? 0);
+        }
+
+        private async Task FlushAsync(CancellationToken ct)
+        {
+            if (_pendingChanges == 0) return;
+            await _db.SaveChangesAsync(ct);
+            _pendingChanges = 0;
         }
     }
 }

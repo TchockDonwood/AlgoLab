@@ -9,9 +9,5 @@ namespace AlgoLab.Application.Common.Interfaces
             int n,
             int? m,
             CancellationToken cancellationToken);
-
-        Task SaveAsync(
-            BenchmarkRun result,
-            CancellationToken cancellationToken);
     }
 }

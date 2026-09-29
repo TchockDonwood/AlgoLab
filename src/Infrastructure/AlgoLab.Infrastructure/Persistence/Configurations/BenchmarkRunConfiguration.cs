@@ -15,7 +15,6 @@ namespace AlgoLab.Infrastructure.Persistence.Configurations
             builder.Property(x => x.ExecutionTimeMs)
                 .IsRequired();
 
-            // ОБНОВЛЕННЫЙ ИНДЕКС: теперь включает M
             builder.HasIndex(x => new { x.AlgorithmId, x.N, x.M })
                 .IsUnique();
 
