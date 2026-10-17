@@ -35,7 +35,8 @@ namespace AlgoLab.Infrastructure.Persistence
                 new Algorithm { Id = Guid.Parse("11111111-1111-1111-1111-11111111111C"), Code = "simple-pow", Name = "Простое возведение в степень", InputArity = 1 },
                 new Algorithm { Id = Guid.Parse("11111111-1111-1111-1111-11111111111D"), Code = "recursive-pow", Name = "Рекурсивное возведение в степень", InputArity = 1 },
                 new Algorithm { Id = Guid.Parse("11111111-1111-1111-1111-11111111111E"), Code = "quick-recursive-pow", Name = "Быстрое рекурсивное возведение в степень", InputArity = 1 },
-                new Algorithm { Id = Guid.Parse("11111111-1111-1111-1111-11111111111F"), Code = "atkin-sieve", Name = "Решето Аткина", InputArity = 1 }
+                new Algorithm { Id = Guid.Parse("11111111-1111-1111-1111-11111111111F"), Code = "atkin-sieve", Name = "Решето Аткина", InputArity = 1 },
+                new Algorithm { Id = Guid.Parse("11111111-1111-1111-1111-111111111121"), Code = "permutations-backtrack", Name = "Генерация всех перестановок", InputArity = 1 }
             );
         }
     }
