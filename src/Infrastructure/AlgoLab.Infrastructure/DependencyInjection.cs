@@ -56,6 +56,7 @@ namespace AlgoLab.Infrastructure
             services.AddSingleton<IAlgorithm, SimplePow>();
             services.AddSingleton<IAlgorithm, RecursivePow>();
             services.AddSingleton<IAlgorithm, QuickRecursivePow>();
+            services.AddSingleton<IAlgorithm, PermutationsBacktrack>();
             
             services.AddSingleton<IAlgorithmRegistry, AlgorithmRegistry>();
 
